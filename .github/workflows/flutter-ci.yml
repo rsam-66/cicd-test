@@ -30,8 +30,15 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Build debug APK
-      run: flutter build apk --debug
+    - name: Build release APK
+      run: flutter build apk --release
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+       name: release-apk
+       path: build/app/outputs/flutter-apk/app-release.apk
+
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
