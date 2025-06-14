@@ -1,0 +1,47 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Java 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Clone Flutter 3.22.1
+      run: |
+        git clone https://github.com/flutter/flutter.git --branch 3.22.1 --depth 1
+        echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+        ./flutter/bin/flutter --version
+        ./flutter/bin/flutter precache
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Build debug APK
+      run: flutter build apk --debug
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install Node.js dependencies
+      working-directory: ./apiRizzhoma
+      run: npm install
+
+    - name: Run backend tests
+      working-directory: ./apiRizzhoma
+      run: npm test
